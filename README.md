@@ -2,7 +2,7 @@
 
 1. SSH
 
-    * [Key authentication](https://github.com/Mik0aj/Server-Cheat-Sheat/edit/main/README.md#Key-authentication)
+    * [Key authentication](README.md#Key-authentication)
 
 2. Proxmox
 
