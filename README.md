@@ -63,6 +63,18 @@ As far as I know to passthrough GPU, your cpu have to support VT-x and VT-d. VT-
     * `video=efifb:off` and `video=vesafb:off` make sure that the GPU framebuffer is not being used. If I understand it correctly it disables drivers for primary GPU. So that host wont use GPU while booting. **IMPORTANT Make sure that these two switches look like this "video=efifb:off video=vesafb:off" otherwise the may not work**
 
 3. Run `update-grub` and Reboot. **IMPORTANT Make sure that changes took affect**. It is very important to check if grub actually updated. to do that run ```cat /proc/cmdline``` If you get output similar to this ```BOOT_IMAGE=/boot/vmlinuz-5.11.22-4-pve root=/dev/mapper/pve-root ro quiet intel_iommu=on intel_iommu=pt video=efifb:off video=vesafb:off``` everything is working correctly.
+4. You'll have to modify `/etc/modules` and add ```vfio
+vfio_iommu_type1
+vfio_pci
+vfio_virqfd```
+5. You'll have to create `/etc/modprobe.d/iommu_unsafe_interrupts.conf` with `options vfio_iommu_type1 allow_unsafe_interrupts=1` inside.
+6. You'll have to create `/etc/modprobe.d/kvm.conf` with `options kvm ignore_msrs=1` inside.
+7. Now it's time to blacklist GPU drivers. Create `/etc/modprobe.d/blacklist.conf` and add 'blacklist driver'. It should look simillar to this.```blacklist radeon
+blacklist nouveau
+blacklist nvidia
+blacklist snd_hda_intel
+```
+
 #### Remote desktop
 I tested few remote desktop clients. It isn't as good as having everything hooked up directly to a server. You will encounter some artifacts while using it. For best expirience use wired connection or at least 5GHz wifi.
 
