@@ -2,12 +2,12 @@
 
 1. SSH
 
-    1. [Key authentication](README.md#Key authentication)
+    * [Key authentication](https://github.com/Mik0aj/Server-Cheat-Sheat/edit/main/README.md#Key authentication)
 
 2. Proxmox
 
-    1. Ip change
-    2. GPU passthrough
+    * Ip change
+    * GPU passthrough
 
 ### SSHs
 
