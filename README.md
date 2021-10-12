@@ -3,6 +3,7 @@
 1. [SSH](README.md#SSH)
 
     * [Key authentication](README.md#Key-authentication)
+    * [Bandwidth test](README.md#Bandwidth-test)
 
 2. [Proxmox](README.md#Proxmox)
 
@@ -20,6 +21,13 @@ ssh-keygen -t rsa
 2. Copy the public half of the key pair to server
 ```
 ssh-copy-id -i ~/.ssh/id_rsa.pub user@server
+```
+
+#### Bandwidth test
+
+SSH command to test the speed beetween two computers. The command prints a 1GB dummy file full of zeros to stdout on the remote server, which is printed (transferred) via SSH to stdout of the local server and then locally piped to /dev/null. Requires only SSH so you don't need to install any additional packages.
+```
+ssh user@server 'dd if=/dev/zero bs=1GB count=1 2>/dev/null' | dd of=/dev/null status=progress
 ```
 
 ### Proxmox
@@ -59,8 +67,8 @@ As far as I know to passthrough GPU, your cpu have to support VT-x and VT-d. VT-
     
     * `intel_iommu=on` enables IOMMU
     
-    * `intel_iommu=pt` allows for SR-IOV, which lets you split your GPU into smaller virtual GPUs, currently i am not using it, and i will probably never will by default GTX 10xx family doesn't support it. There are workarounds but with 1050ti I came to conclusion that it is not worth even trying.
-    * `video=efifb:off` and `video=vesafb:off` make sure that the GPU framebuffer is not being used. If I understand it correctly it disables drivers for primary GPU. So that host wont use GPU while booting. **IMPORTANT Make sure that these two switches look like this "video=efifb:off video=vesafb:off" otherwise the may not work**
+    * `intel_iommu=pt` allows for SR-IOV, which lets you split your GPU into smaller virtual GPUs, currently i am not using it, and probably never will. By default GTX 10xx family doesn't support it. There are workarounds but with 1050ti I came to conclusion that it is not worth even trying.
+    * `video=efifb:off` and `video=vesafb:off` make sure that the GPU framebuffer is not being used. If I understand it correctly it disables drivers for primary GPU. So that host wont use GPU while booting. **IMPORTANT Make sure that these two kernel parameters look like this "video=efifb:off video=vesafb:off" otherwise the may not work**
 
 3. Run `update-grub` and Reboot. **IMPORTANT Make sure that changes took affect**. It is very important to check if grub actually updated. to do that run ```cat /proc/cmdline``` If you get output similar to this ```BOOT_IMAGE=/boot/vmlinuz-5.11.22-4-pve root=/dev/mapper/pve-root ro quiet intel_iommu=on intel_iommu=pt video=efifb:off video=vesafb:off``` everything is working correctly.
 4. You'll have to modify `/etc/modules` and add ```vfio
@@ -72,8 +80,7 @@ vfio_virqfd```
 7. Now it's time to blacklist GPU drivers. Create `/etc/modprobe.d/blacklist.conf` and add 'blacklist driver'. It should look simillar to this.```blacklist radeon
 blacklist nouveau
 blacklist nvidia
-blacklist snd_hda_intel
-```
+blacklist snd_hda_intel```
 
 #### Remote desktop
 I tested few remote desktop clients. It isn't as good as having everything hooked up directly to a server. You will encounter some artifacts while using it. For best expirience use wired connection or at least 5GHz wifi.
